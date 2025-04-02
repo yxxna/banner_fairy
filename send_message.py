@@ -7,10 +7,10 @@ import time
 
 
 
-# channel_id = "C08KRL1B4EB"
+channel_id = "C08KRL1B4EB"
 #
 # test용 채널 아이디 "배너요정 테스트 채널" 테스트 하고싶으면 아래 코드 한줄 주석 풀고 위에 { channel_id = "C08KRL1B4EB" } 주석 처리
-channel_id = "C08L22G50CA" 
+# channel_id = "C08L22G50CA" 
 #
 load_dotenv()
 slack_token = os.getenv("SLACK_TOKEN")
@@ -103,7 +103,7 @@ def get_text(day, mention):
 # ✅ 메시지 보내기
 send_day = should_send_message()
 # 테스트 '배너요정 테스트 채널'로 보내고 싶으면 아래 코드 한 줄 주석 풀기 
-send_day = 5
+# send_day = 5
 
 
 

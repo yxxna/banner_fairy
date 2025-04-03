@@ -1,20 +1,19 @@
 from dotenv import load_dotenv
 import os
 from slack_sdk import WebClient
-import datetime
-import schedule
-import time
 
 
-
+# ✅ 슬랙 채널 ID 설정
 channel_id = "C08KRL1B4EB"
-#
-# test용 채널 아이디 "배너요정 테스트 채널" 테스트 하고싶으면 아래 코드 한줄 주석 풀고 위에 { channel_id = "C08KRL1B4EB" } 주석 처리
-# channel_id = "C08L22G50CA" 
-#
+# 테스트용 채널로 보내고 싶으면 아래 줄 주석 해제
+# channel_id = "C08L22G50CA"
+
+# ✅ 환경 변수 불러오기
 load_dotenv()
 slack_token = os.getenv("SLACK_TOKEN")
 client = WebClient(token=slack_token)
+
+
 
 # 👇 공휴일 리스트 (2025년 예시)
 KOREAN_HOLIDAYS = [
@@ -115,10 +114,10 @@ if send_day:
         print("✅ 메시지 전송 완료:", response)
 
 
-import schedule
-import time
+#import schedule
+#import time
 
-def run_bot():
+#def run_bot():
     send_day = should_send_message()
     if send_day:
         mention = get_mention(send_day)

@@ -130,13 +130,9 @@ if send_day:
             print("✅ 메시지 전송 완료:", response)
 
 # 매일 아침 9시에 실행
-schedule.every().day.at("09:00").do(run_bot)
+schedule.every().day.at("10:30").do(run_bot)
 
 print("⏰ 슬랙 메시지 봇이 실행 중입니다...")
-
-while True:
-    schedule.run_pending()
-    time.sleep(60)
 
 
 

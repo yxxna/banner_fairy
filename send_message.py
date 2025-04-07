@@ -28,8 +28,9 @@ today = datetime.date.today()
 def is_holiday_or_weekend(date):
     return date.weekday() >= 5 or date.strftime("%Y-%m-%d") in KOREAN_HOLIDAYS
 
-# ✅ 다음 평일로 밀기
 def get_next_working_day(date):
+    # 👉 기준일 다음 날부터 확인
+    date += datetime.timedelta(days=1)
     while is_holiday_or_weekend(date):
         date += datetime.timedelta(days=1)
     return date
@@ -41,7 +42,7 @@ def should_send_message():
             base_date = today.replace(day=day)
         except ValueError:
             continue  # 2월 30일 같은 날짜 예외 처리
-        send_day = get_next_working_day(base_date)
+         send_day = get_next_working_day(base_date) if is_holiday_or_weekend(base_date) else base_date
         if send_day == today:
             return day
     return None

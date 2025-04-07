@@ -6,9 +6,9 @@ from slack_sdk import WebClient
 
 
 # ✅ 슬랙 채널 ID 설정
-channel_id = "C08KRL1B4EB"
+# channel_id = "C08KRL1B4EB"
 # 테스트용 채널로 보내고 싶으면 아래 줄 주석 해제
-# channel_id = "C08L22G50CA"
+channel_id = "C08L22G50CA"
 
 # ✅ 환경 변수 불러오기
 load_dotenv()

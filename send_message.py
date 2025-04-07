@@ -106,9 +106,6 @@ def get_text(day, mention):
 send_day = should_send_message()
 # 테스트 '배너요정 테스트 채널'로 보내고 싶으면 아래 코드 한 줄 주석 풀기 
 # send_day = 5
-
-
-
 if send_day:
     mention = get_mention(send_day)
     text = get_text(send_day, mention)
@@ -120,14 +117,6 @@ if send_day:
 #import schedule
 #import time
 
-#def run_bot():
-    send_day = should_send_message()
-    if send_day:
-        mention = get_mention(send_day)
-        text = get_text(send_day, mention)
-        if text:
-            response = client.chat_postMessage(channel=channel_id, text=text)
-            print("✅ 메시지 전송 완료:", response)
 
 # 매일 아침 9시에 실행
 schedule.every().day.at("10:30").do(run_bot)

@@ -5,10 +5,10 @@ from slack_sdk import WebClient
 
 
 
-# ✅ 슬랙 채널 ID 설정
-channel_id = "C08KRL1B4EB"
+# ✅ 슬랙 채널 ID 설정 (채널명 : 배너요정) 
+# channel_id = "C08KRL1B4EB"
 # 테스트용 채널로 보내고 싶으면 아래 줄 주석 해제
-# channel_id = "C08L22G50CA"
+channel_id = "C08L22G50CA"
 
 # ✅ 환경 변수 불러오기
 load_dotenv()
@@ -120,7 +120,7 @@ def get_text(day, mention):
 # ✅ 메시지 보내기
 send_day = should_send_message()
 # 테스트 '배너요정 테스트 채널'로 보내고 싶으면 아래 코드 한 줄 주석 풀기 
-# send_day = 5
+send_day = 10
 if send_day:
     mention = get_mention(send_day)
     text = get_text(send_day, mention)
@@ -129,8 +129,8 @@ if send_day:
         print("✅ 메시지 전송 완료:", response)
 
 
-#import schedule
-#import time
+import schedule
+import time
 
 
 # 매일 아침 9시에 실행

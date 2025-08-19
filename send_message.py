@@ -104,8 +104,7 @@ if send_day == 10:
     mention = get_mention(send_day)
 
     # 메시지1
-    text1 = f'''🗓️ {day}일 앱 푸시 배너 제작 요청일입니다! 아래 텍스트를 채워 해당 채널에 보내주세요! 강유나 멘션은 필수입니다! ❤️
-
+    text1 = f"""🗓️ {day}일 앱 푸시 배너 제작 요청일입니다! 아래 텍스트를 채워 해당 채널에 보내주세요! 강유나 멘션은 필수입니다! ❤️
 1. 배너 목적 – 이 배너에서 강조하고자 하는 것이 무엇인가요? 최종 목적은 무엇인가요? (낮은 이자 대출 홍보, 보험 가입, 카드 발급 등)
 2. 타겟 사용자 – 이 배너는 어떤 사용자에게 노출되나요? 어떤 사람들에게 노출되는 건가요? (예: 대출 심사를 받은 50대 등)
 3. 메인 문구 – 가장 강조해야 하는 문장을 써주세요. 키워드로 작성해도 좋아요
@@ -116,13 +115,12 @@ if send_day == 10:
 8. 제작할 내용 머니적립 or 금융광고 :
 
 
-👤 담당자: {mention}
-'''
-     client.chat_postMessage(channel=CHANNEL_ID, text=text1)
+👤 담당자: {mention}"""
+    client.chat_postMessage(channel=CHANNEL_ID, text=text1)
 
     # 메시지2
-    text2 = f'''🗓️ {day}일 KT외부 배너 제작 요청일입니다! 아래 텍스트를 채워 해당 채널에 보내주세요! 강유나 멘션은 필수입니다! ❤️
 
+    text2 = f"""🗓️ {day}일 KT외부 배너 제작 요청일입니다! 아래 텍스트를 채워 해당 채널에 보내주세요! 강유나 멘션은 필수입니다! ❤️
 1. 배너 목적 – 이 배너에서 강조하고자 하는 것이 무엇인가요? 최종 목적은 무엇인가요? (낮은 이자 대출 홍보, 보험 가입, 카드 발급 등)
 2. 타겟 사용자 – 이 배너는 어떤 사용자에게 노출되나요? 어떤 사람들에게 노출되는 건가요? (예: 대출 심사를 받은 50대 등)
 3. 메인 문구 – 가장 강조해야 하는 문장을 써주세요. 키워드로 작성해도 좋아요
@@ -131,17 +129,17 @@ if send_day == 10:
 6. 디자인 참고자료 – 디자인에서 피해갈 요소가 있나요? (예: 특정 색상, 문구 등)
 7. 희망 색상/톤:
 
-👤 담당자: {mention}
-'''
+👤 담당자: {mention}"""
     client.chat_postMessage(channel=CHANNEL_ID, text=text2)
-        print("✅ 10일 두 건 전송 완료")
-        return
+    print("✅ 10일 두 건 전송 완료")
+    return
+
 
  # 5일/15일
-    text = get_text(day, mention)
-    if text:
-        client.chat_postMessage(channel=CHANNEL_ID, text=text)
-        print(f"✅ {day}일 전송 완료")
+text = get_text(day, mention)
+if text:
+    client.chat_postMessage(channel=CHANNEL_ID, text=text)
+    print(f"✅ {day}일 전송 완료")
 
 if __name__ == "__main__":
     # 테스트/수동 실행용 강제 날짜 (예: 5/10/15)

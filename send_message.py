@@ -7,9 +7,12 @@ from slack_sdk import WebClient
 
 # ✅ 슬랙 채널 ID 설정 (채널명 : 배너요정) 
 
-CHANNEL_ID = os.getenv("SLACK_CHANNEL_ID", "C08KRL1B4EB")
+# CHANNEL_ID = os.getenv("SLACK_CHANNEL_ID", "C08KRL1B4EB")
 # channel_id = "C08KRL1B4EB"
+
+
 # 테스트용 채널로 보내고 싶으면 아래 줄 주석 해제
+CHANNEL_ID = os.getenv("SLACK_CHANNEL_ID", "C08L22G50CA")
 # channel_id = "C08L22G50CA"
 
 # ✅ 환경 변수 불러오기
@@ -26,7 +29,7 @@ KOREAN_HOLIDAYS = [
 ]
 
 scheduled_days = [5, 10, 15]
-today = datetime.date.today()
+today = datetime.date.today(2025, 8, 10)
 
 # ✅ 날짜가 주말 or 공휴일인지?
 def is_holiday_or_weekend(date):

@@ -14,8 +14,12 @@ SLACK_TOKEN = os.getenv("SLACK_TOKEN")  # GitHub Secrets에 저장돼 있어야 
 if not SLACK_TOKEN:
     raise RuntimeError("SLACK_TOKEN 이 설정되어 있지 않아요. GitHub Secrets에 SLACK_TOKEN을 추가해주세요.")
 
-# 채널 ID: 환경변수에 없으면 테스트 채널로 기본값
-CHANNEL_ID = os.getenv("SLACK_CHANNEL_ID", "C08L22G50CA")
+
+# ✅ 슬랙 채널 ID 설정 (채널명 : 배너요정) 
+CHANNEL_ID = os.getenv("SLACK_CHANNEL_ID", "C08KRL1B4EB")
+
+# 테스트 채널 ID: 환경변수에 없으면 테스트 채널로 기본값
+# CHANNEL_ID = os.getenv("SLACK_CHANNEL_ID", "C08L22G50CA")
 
 client = WebClient(token=SLACK_TOKEN)
 

@@ -6,7 +6,9 @@ from slack_sdk import WebClient
 
 
 # ✅ 슬랙 채널 ID 설정 (채널명 : 배너요정) 
-channel_id = "C08KRL1B4EB"
+
+CHANNEL_ID = os.getenv("SLACK_CHANNEL_ID", "C08KRL1B4EB")
+# channel_id = "C08KRL1B4EB"
 # 테스트용 채널로 보내고 싶으면 아래 줄 주석 해제
 # channel_id = "C08L22G50CA"
 
@@ -99,7 +101,7 @@ if send_day == 10:
     mention = get_mention(send_day)
 
     # 메시지1
-    text1 = '''🗓️ {day}일 앱 푸시 배너 제작 요청일입니다! 아래 텍스트를 채워 해당 채널에 보내주세요! 강유나 멘션은 필수입니다! ❤️
+    text1 = f'''🗓️ {day}일 앱 푸시 배너 제작 요청일입니다! 아래 텍스트를 채워 해당 채널에 보내주세요! 강유나 멘션은 필수입니다! ❤️
 
 1. 배너 목적 – 이 배너에서 강조하고자 하는 것이 무엇인가요? 최종 목적은 무엇인가요? (낮은 이자 대출 홍보, 보험 가입, 카드 발급 등)
 2. 타겟 사용자 – 이 배너는 어떤 사용자에게 노출되나요? 어떤 사람들에게 노출되는 건가요? (예: 대출 심사를 받은 50대 등)
@@ -113,11 +115,10 @@ if send_day == 10:
 
 👤 담당자: {mention}
 '''
-    response1 = client.chat_postMessage(channel=channel_id, text=text1)
-    print("✅ 메시지1 전송 완료:", response1)
+     client.chat_postMessage(channel=CHANNEL_ID, text=text1)
 
     # 메시지2
-    text2 = '''🗓️ {day}일 KT외부 배너 제작 요청일입니다! 아래 텍스트를 채워 해당 채널에 보내주세요! 강유나 멘션은 필수입니다! ❤️
+    text2 = f'''🗓️ {day}일 KT외부 배너 제작 요청일입니다! 아래 텍스트를 채워 해당 채널에 보내주세요! 강유나 멘션은 필수입니다! ❤️
 
 1. 배너 목적 – 이 배너에서 강조하고자 하는 것이 무엇인가요? 최종 목적은 무엇인가요? (낮은 이자 대출 홍보, 보험 가입, 카드 발급 등)
 2. 타겟 사용자 – 이 배너는 어떤 사용자에게 노출되나요? 어떤 사람들에게 노출되는 건가요? (예: 대출 심사를 받은 50대 등)
@@ -129,24 +130,34 @@ if send_day == 10:
 
 👤 담당자: {mention}
 '''
-    response2 = client.chat_postMessage(channel=channel_id, text=text2)
-    print("✅ 메시지2 전송 완료:", response2)
+    client.chat_postMessage(channel=CHANNEL_ID, text=text2)
+        print("✅ 10일 두 건 전송 완료")
+        return
 
-elif send_day == 5 or send_day == 15:
-    mention = get_mention(send_day)
-    text = get_text(send_day, mention)
+ # 5일/15일
+    text = get_text(day, mention)
     if text:
-        response = client.chat_postMessage(channel=channel_id, text=text)
-        print("✅ 메시지 전송 완료:", response)
+        client.chat_postMessage(channel=CHANNEL_ID, text=text)
+        print(f"✅ {day}일 전송 완료")
+
+if __name__ == "__main__":
+    # 테스트/수동 실행용 강제 날짜 (예: 5/10/15)
+    force = os.getenv("FORCE_DAY")
+    day = int(force) if force else should_send_message()
+
+    if day in SCHEDULED_DAYS:
+        send_for_day(day)
+    else:
+        print("오늘은 발송일이 아닙니다. (또는 FORCE_DAY 미설정)")
 
 # import schedule
 # import time
 
 
 # 매일 아침 9시에 실행
-schedule.every().day.at("10:30").do(run_bot)
+# schedule.every().day.at("10:30").do(run_bot)
 
-print("⏰ 슬랙 메시지 봇이 실행 중입니다...")
+# print("⏰ 슬랙 메시지 봇이 실행 중입니다...")
 
 
 

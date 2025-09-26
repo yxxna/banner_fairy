@@ -16,17 +16,17 @@ if not SLACK_TOKEN:
 
 
 # ✅ 슬랙 채널 ID 설정 (채널명 : 배너요정) 
-CHANNEL_ID = os.getenv("SLACK_CHANNEL_ID", "C08KRL1B4EB")
+# CHANNEL_ID = os.getenv("SLACK_CHANNEL_ID", "C08KRL1B4EB")
 
 # 테스트 채널 ID: 환경변수에 없으면 테스트 채널로 기본값
-# CHANNEL_ID = os.getenv("SLACK_CHANNEL_ID", "C08L22G50CA")
+ CHANNEL_ID = os.getenv("SLACK_CHANNEL_ID", "C08L22G50CA")
 
 client = WebClient(token=SLACK_TOKEN)
 
 # -------------------------------
 # 1) 일정/공휴일
 # -------------------------------
-SCHEDULED_DAYS = (5, 10, 15)
+SCHEDULED_DAYS = (5, 10, 15, 20)
 
 KOREAN_HOLIDAYS = {
     "2025-01-01", "2025-03-01", "2025-05-05", "2025-06-06", "2025-08-15",

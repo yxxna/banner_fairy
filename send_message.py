@@ -19,7 +19,7 @@ if not SLACK_TOKEN:
 # CHANNEL_ID = os.getenv("SLACK_CHANNEL_ID", "C08KRL1B4EB")
 
 # 테스트 채널 ID: 환경변수에 없으면 테스트 채널로 기본값
- CHANNEL_ID = os.getenv("SLACK_CHANNEL_ID", "C08L22G50CA")
+CHANNEL_ID = os.getenv("SLACK_CHANNEL_ID", "C08L22G50CA")
 
 client = WebClient(token=SLACK_TOKEN)
 

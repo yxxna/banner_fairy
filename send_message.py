@@ -1,9 +1,11 @@
-# # ------------------------------------------ 2025.08.19 new 코드 
+# # ------------------------------------------ 2025.08.19 new 코드
 # send_message.py
 from dotenv import load_dotenv
 import os
 import datetime as dt
+from zoneinfo import ZoneInfo
 from slack_sdk import WebClient
+from slack_sdk.errors import SlackApiError
 
 # -------------------------------
 # 0) 기본 설정 & 클라이언트
@@ -15,7 +17,7 @@ if not SLACK_TOKEN:
     raise RuntimeError("SLACK_TOKEN 이 설정되어 있지 않아요. GitHub Secrets에 SLACK_TOKEN을 추가해주세요.")
 
 
-# ✅ 슬랙 채널 ID 설정 (채널명 : 배너요정) 
+# ✅ 슬랙 채널 ID 설정 (채널명 : 배너요정)
 CHANNEL_ID = os.getenv("SLACK_CHANNEL_ID", "C08KRL1B4EB")
 
 # 테스트 채널 ID: 환경변수에 없으면 테스트 채널로 기본값
@@ -23,14 +25,30 @@ CHANNEL_ID = os.getenv("SLACK_CHANNEL_ID", "C08KRL1B4EB")
 
 client = WebClient(token=SLACK_TOKEN)
 
+KST = ZoneInfo("Asia/Seoul")
+
 # -------------------------------
 # 1) 일정/공휴일
 # -------------------------------
 SCHEDULED_DAYS = (5, 10, 15, 20)
 
 KOREAN_HOLIDAYS = {
+    # 2025
     "2025-01-01", "2025-03-01", "2025-05-05", "2025-06-06", "2025-08-15",
     "2025-10-03", "2025-12-25",
+    # 2026
+    "2026-01-01",
+    "2026-02-16", "2026-02-17", "2026-02-18",  # 설날 연휴
+    "2026-03-01", "2026-03-02",                # 삼일절(일) + 대체공휴일
+    "2026-05-05",                              # 어린이날
+    "2026-05-24", "2026-05-25",                # 부처님오신날(일) + 대체공휴일
+    "2026-06-06",                              # 현충일
+    "2026-08-15", "2026-08-17",                # 광복절(토) + 대체공휴일
+    "2026-09-24", "2026-09-25", "2026-09-26",  # 추석 연휴
+    "2026-09-28",                              # 추석 대체공휴일
+    "2026-10-03", "2026-10-05",                # 개천절(토) + 대체공휴일
+    "2026-10-09",                              # 한글날
+    "2026-12-25",                              # 성탄절
 }
 
 def is_holiday_or_weekend(d: dt.date) -> bool:
@@ -116,9 +134,36 @@ def get_text_for_5_or_15(day: int, mention: str) -> str | None:
 """
     return None
 
-def send_for_day(day: int) -> None:
+# -------------------------------
+# 2.5) 중복 발송 방지 (오늘 KST 기준으로 같은 첫 줄 메시지가 이미 있는지)
+# -------------------------------
+def already_sent(first_line: str, today_kst: dt.date) -> bool:
+    start_ts = dt.datetime.combine(today_kst, dt.time(0, 0), tzinfo=KST).timestamp()
+    try:
+        resp = client.conversations_history(
+            channel=CHANNEL_ID, oldest=str(start_ts), limit=200
+        )
+    except SlackApiError as e:
+        # missing_scope / not_in_channel 등 — 멱등성 체크 불가하면 그냥 발송
+        err = e.response.get("error", str(e))
+        print(f"⚠️ history 조회 실패({err}). 중복 체크 스킵하고 발송 진행")
+        return False
+    for msg in resp.get("messages", []):
+        if msg.get("text", "").startswith(first_line):
+            return True
+    return False
+
+def safe_post(text: str, today_kst: dt.date) -> None:
+    first_line = text.split("\n", 1)[0]
+    if already_sent(first_line, today_kst):
+        print(f"⏭️ 중복 감지 — 오늘 이미 발송됨: {first_line[:50]}")
+        return
+    client.chat_postMessage(channel=CHANNEL_ID, text=text)
+    print(f"✅ 전송 완료: {first_line[:50]}")
+
+def send_for_day(day: int, today_kst: dt.date) -> None:
     """
-    day가 10이면 2건, 5/15면 1건 발송.
+    day가 10이면 2건, 5/15/20이면 1건 발송. 같은 날 중복 발송은 자동 방지.
     """
     mention = get_mention(day)
 
@@ -152,16 +197,14 @@ def send_for_day(day: int) -> None:
 👤 담당자: {mention}
 """
         
-        client.chat_postMessage(channel=CHANNEL_ID, text=text1)
-        client.chat_postMessage(channel=CHANNEL_ID, text=text2)
-        print("✅ 10일: 두 건 전송 완료")
+        safe_post(text1, today_kst)
+        safe_post(text2, today_kst)
         return
 
-    # 5일/15일: 공통 템플릿 1건
+    # 5일/15일/20일: 공통 템플릿 1건
     text = get_text_for_5_or_15(day, mention)
     if text:
-        client.chat_postMessage(channel=CHANNEL_ID, text=text)
-        print(f"✅ {day}일: 전송 완료")
+        safe_post(text, today_kst)
     else:
         print(f"⚠️ {day}일: 전송 텍스트가 없습니다.")
 
@@ -180,24 +223,25 @@ if __name__ == "__main__":
         except ValueError:
             raise RuntimeError("FORCE_TODAY 는 YYYY-MM-DD 형식이어야 합니다.")
     else:
-        today = dt.date.today()
+        # ⚠️ GitHub Actions 러너는 UTC. KST 기준으로 명시.
+        today = dt.datetime.now(KST).date()
 
     if force_day:
-        # 강제로 5/10/15 중 하나 지정되어 들어온 경우: 그냥 그 날짜용 메시지를 보냄
+        # 강제로 5/10/15/20 중 하나 지정되어 들어온 경우
         try:
             day_num = int(force_day)
         except ValueError:
             raise RuntimeError("FORCE_DAY 는 5/10/15/20 중 하나의 숫자여야 합니다.")
         if day_num not in SCHEDULED_DAYS:
             raise RuntimeError("FORCE_DAY 는 5/10/15/20 중 하나여야 합니다.")
-        send_for_day(day_num)
+        send_for_day(day_num, today)
     else:
         # 평소 동작: 오늘이 발송일인지 계산해서 맞으면 발송
         scheduled_day = compute_send_day(today)
         if scheduled_day:
-            send_for_day(scheduled_day)
+            send_for_day(scheduled_day, today)
         else:
-            print("오늘은 발송일이 아닙니다. (또는 보정 결과가 오늘이 아님)")
+            print(f"오늘({today})은 발송일이 아닙니다. (또는 보정 결과가 오늘이 아님)")
 
 
 

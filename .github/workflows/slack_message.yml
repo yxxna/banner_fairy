@@ -2,11 +2,15 @@ name: Send Slack Message
 
 on:
   schedule:
-    - cron: '0 0 * * *'   # 매일 00:00 UTC (KST 09:00)
+    # GitHub Actions의 schedule은 best-effort라 가끔 스킵됨.
+    # 하루에 3번 시도해서 누락 확률을 낮춤. 중복 발송은 send_message.py에서 방지.
+    - cron: '0 0 * * *'   # KST 09:00
+    - cron: '0 3 * * *'   # KST 12:00 (백업)
+    - cron: '0 6 * * *'   # KST 15:00 (백업)
   workflow_dispatch:
     inputs:
       force_day:
-        description: '강제로 보낼 날짜(5/10/15)'
+        description: '강제로 보낼 날짜(5/10/15/20)'
         required: false
 
 jobs:

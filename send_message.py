@@ -137,6 +137,19 @@ def get_text_for_5_or_15(day: int, mention: str) -> str | None:
 # -------------------------------
 # 2.5) 중복 발송 방지 (오늘 KST 기준으로 같은 첫 줄 메시지가 이미 있는지)
 # -------------------------------
+def _dedup_key(first_line: str) -> str:
+    """
+    중복 체크용 안정적인 키. 첫 줄에서 emoji/변수 영향 적은 substring을 뽑음.
+    예: "🗓️ 20일 머니적립 출석체크 배너 제작 요청일입니다! ..."
+        → "20일 머니적립 출석체크 배너 제작 요청일입니다"
+    """
+    # 앞쪽 🗓️ 이모지 제거
+    s = first_line.lstrip("🗓️ ").strip()
+    # 첫 느낌표 전까지를 키로 사용 (없으면 첫 40자)
+    if "!" in s:
+        s = s.split("!", 1)[0].strip()
+    return s[:40]
+
 def already_sent(first_line: str, today_kst: dt.date) -> bool:
     start_ts = dt.datetime.combine(today_kst, dt.time(0, 0), tzinfo=KST).timestamp()
     try:
@@ -148,8 +161,13 @@ def already_sent(first_line: str, today_kst: dt.date) -> bool:
         err = e.response.get("error", str(e))
         print(f"⚠️ history 조회 실패({err}). 중복 체크 스킵하고 발송 진행")
         return False
-    for msg in resp.get("messages", []):
-        if msg.get("text", "").startswith(first_line):
+    messages = resp.get("messages", [])
+    key = _dedup_key(first_line)
+    print(f"🔍 history 조회: {len(messages)}건 / 매칭키='{key}'")
+    for i, msg in enumerate(messages[:3]):
+        print(f"   [{i}] text={(msg.get('text','') or '')[:80]!r}")
+    for msg in messages:
+        if key and key in (msg.get("text", "") or ""):
             return True
     return False
 

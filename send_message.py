@@ -85,7 +85,7 @@ def get_mention(day: int) -> str:
     return {
         5:  "<@U02BG5HQZV4>",   # 권씨
         10: "<@U05B537RSJC>",   # 김씨
-        15: "<@U05B537RSJC>",   # 문씨
+        15: "<@U05B537RSJC>",   # 김씨
         20: "<@U02BG5HQZV4>",   # 권씨
     }.get(day, "")
 

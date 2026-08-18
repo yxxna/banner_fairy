@@ -84,8 +84,8 @@ def compute_send_day(today: dt.date) -> int | None:
 def get_mention(day: int) -> str:
     return {
         5:  "<@U02BG5HQZV4>",   # 권씨
-        10: "<@U05B537RSJC>",   # 김씨
-        15: "<@U05B537RSJC>",   # 김씨
+        10: "<@U02BG5HQZV4>",   # 권씨
+        15: "<@U02BG5HQZV4>",   # 권씨
         20: "<@U02BG5HQZV4>",   # 권씨
     }.get(day, "")
 

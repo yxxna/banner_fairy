@@ -10,7 +10,7 @@ on:
   workflow_dispatch:
     inputs:
       force_day:
-        description: '강제로 보낼 날짜(5/10/15/20)'
+        description: '강제로 보낼 날짜(5/10/20)'
         required: false
 
 jobs:

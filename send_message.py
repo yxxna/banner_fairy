@@ -1,4 +1,4 @@
-# # ------------------------------------------ 2025.08.19 new 코드
+# ------------------------------------------ 2025.08.19 new 코드 (2026.10.15 15일 대출비교 배너 발송 중단)
 # send_message.py
 from dotenv import load_dotenv
 import os
@@ -30,7 +30,8 @@ KST = ZoneInfo("Asia/Seoul")
 # -------------------------------
 # 1) 일정/공휴일
 # -------------------------------
-SCHEDULED_DAYS = (5, 10, 15, 20)
+# 15일(대출비교 프로모션 배너)은 2026.10.15부로 발송 중단
+SCHEDULED_DAYS = (5, 10, 20)
 
 KOREAN_HOLIDAYS = {
     # 2025
@@ -63,13 +64,13 @@ def push_to_next_working_day(d: dt.date) -> dt.date:
 
 def compute_send_day(today: dt.date) -> int | None:
     """
-    오늘 날짜(today)가 5/10/15/20를 주말·공휴일 보정한 '발송일'에 해당하면
-    그 원래 기준일(5/10/15/20) 숫자를 반환. 아니면 None.
+    오늘 날짜(today)가 5/10/20을 주말·공휴일 보정한 '발송일'에 해당하면
+    그 원래 기준일(5/10/20) 숫자를 반환. 아니면 None.
     """
     year, month = today.year, today.month
     for day in SCHEDULED_DAYS:
         try:
-            base = dt.date(year, month, day)          # 이번 달 5/10/15
+            base = dt.date(year, month, day)          # 이번 달 5/10/20
         except ValueError:
             # (예: 2월 30일 같은 불가능 날짜는 건너뜀)
             continue
@@ -85,27 +86,12 @@ def get_mention(day: int) -> str:
     return {
         5:  "<@U02BG5HQZV4>",   # 권씨
         10: "<@U02BG5HQZV4>",   # 권씨
-        15: "<@U02BG5HQZV4>",   # 권씨
         20: "<@U02BG5HQZV4>",   # 권씨
     }.get(day, "")
 
-def get_text_for_5_or_15(day: int, mention: str) -> str | None:
+def get_text_for_5_or_20(day: int, mention: str) -> str | None:
     if day == 5:
         return f"""🗓️ {day}일 인증완료 배너 제작 요청일입니다! 아래 텍스트를 채워 해당 채널에 보내주세요! 강유나 멘션은 필수입니다! ❤️
-
-1. 배너 목적 – 이 배너에서 강조하고자 하는 것이 무엇인가요? 최종 목적은 무엇인가요? (낮은 이자 대출 홍보, 보험 가입, 카드 발급 등)
-2. 타겟 사용자 – 이 배너는 어떤 사용자에게 노출되나요? 어떤 사람들에게 노출되는 건가요? (예: 대출 심사를 받은 50대 등)
-3. 메인 문구 – 가장 강조해야 하는 문장을 써주세요. 키워드로 작성해도 좋아요
-4. 보조 문구 – 보조적으로 쓰이는 문장은? 쓰셨던 텍스트 요약해서 작성해줘도 좋아요
-5. CTA (있다면) – 어떤 행동을 하길 원하는가요?
-6. 디자인 참고자료 – 디자인에서 피해갈 요소가 있나요? (예: 특정 색상, 문구 등)
-7. 희망 색상/톤: 유나님이 알아서 해주세요 / XXX톤으로 해주세요 or 계절감이 느껴지는 색상으로 만들어주세요. 
-8. 기한: xx월 xx일   오전(점심 전) or 제가 퇴근하기 전  까지 해주세요.
-
-👤 담당자: {mention}
-"""
-    if day == 15:
-        return f"""🗓️ {day}일 대출비교 프로모션 배너 제작 요청일입니다! 아래 텍스트를 채워 해당 채널에 보내주세요! 강유나 멘션은 필수입니다! ❤️
 
 1. 배너 목적 – 이 배너에서 강조하고자 하는 것이 무엇인가요? 최종 목적은 무엇인가요? (낮은 이자 대출 홍보, 보험 가입, 카드 발급 등)
 2. 타겟 사용자 – 이 배너는 어떤 사용자에게 노출되나요? 어떤 사람들에게 노출되는 건가요? (예: 대출 심사를 받은 50대 등)
@@ -181,7 +167,7 @@ def safe_post(text: str, today_kst: dt.date) -> None:
 
 def send_for_day(day: int, today_kst: dt.date) -> None:
     """
-    day가 10이면 2건, 5/15/20이면 1건 발송. 같은 날 중복 발송은 자동 방지.
+    day가 10이면 2건, 5/20이면 1건 발송. 같은 날 중복 발송은 자동 방지.
     """
     mention = get_mention(day)
 
@@ -214,13 +200,13 @@ def send_for_day(day: int, today_kst: dt.date) -> None:
 
 👤 담당자: {mention}
 """
-        
+
         safe_post(text1, today_kst)
         safe_post(text2, today_kst)
         return
 
-    # 5일/15일/20일: 공통 템플릿 1건
-    text = get_text_for_5_or_15(day, mention)
+    # 5일/20일: 공통 템플릿 1건
+    text = get_text_for_5_or_20(day, mention)
     if text:
         safe_post(text, today_kst)
     else:
@@ -231,7 +217,7 @@ def send_for_day(day: int, today_kst: dt.date) -> None:
 # -------------------------------
 if __name__ == "__main__":
     # 강제 발송용 입력 (GitHub Actions에서 입력으로 넘겨줌)
-    force_day = os.getenv("FORCE_DAY")  # '5' / '10' / '15' 중 하나 또는 빈 값
+    force_day = os.getenv("FORCE_DAY")  # '5' / '10' / '20' 중 하나 또는 빈 값
     # 테스트 목적으로 오늘 날짜를 강제로 지정하고 싶으면 'YYYY-MM-DD'로 넘길 수 있게 옵션 제공(선택)
     force_today = os.getenv("FORCE_TODAY")  # 예: '2025-08-10'
 
@@ -245,13 +231,13 @@ if __name__ == "__main__":
         today = dt.datetime.now(KST).date()
 
     if force_day:
-        # 강제로 5/10/15/20 중 하나 지정되어 들어온 경우
+        # 강제로 5/10/20 중 하나 지정되어 들어온 경우
         try:
             day_num = int(force_day)
         except ValueError:
-            raise RuntimeError("FORCE_DAY 는 5/10/15/20 중 하나의 숫자여야 합니다.")
+            raise RuntimeError("FORCE_DAY 는 5/10/20 중 하나의 숫자여야 합니다.")
         if day_num not in SCHEDULED_DAYS:
-            raise RuntimeError("FORCE_DAY 는 5/10/15/20 중 하나여야 합니다.")
+            raise RuntimeError("FORCE_DAY 는 5/10/20 중 하나여야 합니다.")
         send_for_day(day_num, today)
     else:
         # 평소 동작: 오늘이 발송일인지 계산해서 맞으면 발송
@@ -260,8 +246,6 @@ if __name__ == "__main__":
             send_for_day(scheduled_day, today)
         else:
             print(f"오늘({today})은 발송일이 아닙니다. (또는 보정 결과가 오늘이 아님)")
-
-
 
 
 
